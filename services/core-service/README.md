@@ -16,3 +16,13 @@ Base técnica atual:
 - Security como Resource Server (JWT)
 - JPA + Flyway + PostgreSQL
 - Actuator habilitado
+
+Primeiro slice funcional entregue:
+
+- CRUD basico de quadras
+- disponibilidade semanal por quadra
+- reserva avulsa com validacao de conflito de horario
+
+Observacao de tenancy:
+
+- endpoints funcionais exigem header `X-Tenant-Id`
