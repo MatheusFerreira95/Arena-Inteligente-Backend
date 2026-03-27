@@ -11,6 +11,12 @@ import org.springframework.data.repository.query.Param;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findByTenantIdAndCourtId(String tenantId, Long courtId);
+    List<Reservation> findByTenantIdAndCourtIdAndStartAtLessThanAndEndAtGreaterThan(
+        String tenantId,
+        Long courtId,
+        LocalDateTime periodEnd,
+        LocalDateTime periodStart
+    );
 
     @Query("""
         SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END

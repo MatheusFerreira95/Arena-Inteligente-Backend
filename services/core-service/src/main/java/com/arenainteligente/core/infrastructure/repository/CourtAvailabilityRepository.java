@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourtAvailabilityRepository extends JpaRepository<CourtAvailabilityWindow, Long> {
     List<CourtAvailabilityWindow> findByTenantIdAndCourtId(String tenantId, Long courtId);
+    List<CourtAvailabilityWindow> findByTenantIdAndCourtIdAndDayOfWeek(String tenantId, Long courtId, Integer dayOfWeek);
 }

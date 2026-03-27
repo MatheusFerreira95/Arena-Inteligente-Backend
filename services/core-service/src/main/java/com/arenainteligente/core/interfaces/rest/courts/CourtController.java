@@ -66,4 +66,20 @@ public class CourtController {
     ) {
         courtService.addAvailability(tenantId, courtId, request.dayOfWeek(), request.startTime(), request.endTime());
     }
+
+    @PostMapping("/{courtId}/blocks")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addUnavailabilityBlock(
+        @RequestHeader("X-Tenant-Id") String tenantId,
+        @PathVariable Long courtId,
+        @Valid @RequestBody AddUnavailabilityBlockRequest request
+    ) {
+        courtService.addUnavailabilityBlock(
+            tenantId,
+            courtId,
+            request.startAt(),
+            request.endAt(),
+            request.reason()
+        );
+    }
 }

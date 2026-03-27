@@ -1,12 +1,16 @@
 package com.arenainteligente.core.application.courts;
 
 import com.arenainteligente.core.application.exception.NotFoundException;
+import com.arenainteligente.core.application.exception.ConflictException;
 import com.arenainteligente.core.domain.courts.Court;
 import com.arenainteligente.core.domain.courts.CourtAvailabilityWindow;
 import com.arenainteligente.core.domain.courts.CourtStatus;
+import com.arenainteligente.core.domain.courts.CourtUnavailabilityBlock;
 import com.arenainteligente.core.domain.courts.SportType;
 import com.arenainteligente.core.infrastructure.repository.CourtAvailabilityRepository;
 import com.arenainteligente.core.infrastructure.repository.CourtRepository;
+import com.arenainteligente.core.infrastructure.repository.CourtUnavailabilityBlockRepository;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -17,10 +21,16 @@ public class CourtService {
 
     private final CourtRepository courtRepository;
     private final CourtAvailabilityRepository courtAvailabilityRepository;
+    private final CourtUnavailabilityBlockRepository courtUnavailabilityBlockRepository;
 
-    public CourtService(CourtRepository courtRepository, CourtAvailabilityRepository courtAvailabilityRepository) {
+    public CourtService(
+        CourtRepository courtRepository,
+        CourtAvailabilityRepository courtAvailabilityRepository,
+        CourtUnavailabilityBlockRepository courtUnavailabilityBlockRepository
+    ) {
         this.courtRepository = courtRepository;
         this.courtAvailabilityRepository = courtAvailabilityRepository;
+        this.courtUnavailabilityBlockRepository = courtUnavailabilityBlockRepository;
     }
 
     public List<Court> listByTenant(String tenantId) {
@@ -51,5 +61,24 @@ public class CourtService {
         courtRepository.findByIdAndTenantId(courtId, tenantId)
             .orElseThrow(() -> new NotFoundException("Court not found"));
         return courtAvailabilityRepository.save(new CourtAvailabilityWindow(tenantId, courtId, dayOfWeek, startTime, endTime));
+    }
+
+    @Transactional
+    public CourtUnavailabilityBlock addUnavailabilityBlock(
+        String tenantId,
+        Long courtId,
+        LocalDateTime startAt,
+        LocalDateTime endAt,
+        String reason
+    ) {
+        if (!startAt.isBefore(endAt)) {
+            throw new ConflictException("Invalid block interval");
+        }
+        courtRepository.findByIdAndTenantId(courtId, tenantId)
+            .orElseThrow(() -> new NotFoundException("Court not found"));
+
+        return courtUnavailabilityBlockRepository.save(
+            new CourtUnavailabilityBlock(tenantId, courtId, startAt, endAt, reason)
+        );
     }
 }

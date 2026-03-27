@@ -23,6 +23,13 @@ Primeiro slice funcional entregue:
 - disponibilidade semanal por quadra
 - reserva avulsa com validacao de conflito de horario
 
+Segundo slice funcional entregue:
+
+- bloqueios de agenda/manutencao por periodo
+- validacao de disponibilidade semanal na criacao da reserva
+- validacao de bloqueio de quadra na criacao da reserva
+- consulta de agenda por periodo (`/api/v1/reservations/agenda`)
+
 Observacao de tenancy:
 
 - endpoints funcionais exigem header `X-Tenant-Id`
