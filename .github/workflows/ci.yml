@@ -1,0 +1,30 @@
+name: backend-ci
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  validate-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate expected directories
+        run: |
+          test -d services/auth-service
+          test -d services/core-service
+          test -d services/loyalty-service
+          test -f docker-compose.yml
+
+  docker-compose-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate docker compose syntax
+        run: docker compose config
