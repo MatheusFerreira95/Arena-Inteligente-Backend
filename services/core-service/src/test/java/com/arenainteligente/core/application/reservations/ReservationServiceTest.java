@@ -15,6 +15,7 @@ import com.arenainteligente.core.domain.reservations.ReservationStatus;
 import com.arenainteligente.core.infrastructure.repository.CourtAvailabilityRepository;
 import com.arenainteligente.core.infrastructure.repository.CourtRepository;
 import com.arenainteligente.core.infrastructure.repository.CourtUnavailabilityBlockRepository;
+import com.arenainteligente.core.infrastructure.repository.ReservationAuditEventRepository;
 import com.arenainteligente.core.infrastructure.repository.ReservationRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -43,6 +44,9 @@ class ReservationServiceTest {
     @Mock
     private CourtUnavailabilityBlockRepository courtUnavailabilityBlockRepository;
 
+    @Mock
+    private ReservationAuditEventRepository reservationAuditEventRepository;
+
     private ReservationService reservationService;
 
     @BeforeEach
@@ -51,7 +55,8 @@ class ReservationServiceTest {
             courtRepository,
             courtAvailabilityRepository,
             courtUnavailabilityBlockRepository,
-            reservationRepository
+            reservationRepository,
+            reservationAuditEventRepository
         );
     }
 
@@ -131,10 +136,11 @@ class ReservationServiceTest {
         when(reservationRepository.findByIdAndTenantId(reservationId, tenantId)).thenReturn(Optional.of(reservation));
         when(reservationRepository.save(any(Reservation.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Reservation cancelled = reservationService.cancel(tenantId, reservationId);
+        Reservation cancelled = reservationService.cancel(tenantId, reservationId, "cliente pediu cancelamento", "owner-1");
 
         org.junit.jupiter.api.Assertions.assertEquals(ReservationStatus.CANCELLED, cancelled.getStatus());
         org.junit.jupiter.api.Assertions.assertNotNull(cancelled.getCancelledAt());
+        org.junit.jupiter.api.Assertions.assertEquals("cliente pediu cancelamento", cancelled.getCancelReason());
     }
 
     @Test

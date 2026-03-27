@@ -41,6 +41,9 @@ public class Reservation {
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
 
+    @Column(name = "cancel_reason", length = 255)
+    private String cancelReason;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -69,10 +72,12 @@ public class Reservation {
     public LocalDateTime getEndAt() { return endAt; }
     public ReservationStatus getStatus() { return status; }
     public LocalDateTime getCancelledAt() { return cancelledAt; }
+    public String getCancelReason() { return cancelReason; }
 
-    public void cancel() {
+    public void cancel(String reason) {
         this.status = ReservationStatus.CANCELLED;
         this.cancelledAt = LocalDateTime.now();
+        this.cancelReason = reason;
         this.updatedAt = Instant.now();
     }
 }

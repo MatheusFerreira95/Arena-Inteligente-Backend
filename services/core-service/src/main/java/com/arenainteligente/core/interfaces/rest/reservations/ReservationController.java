@@ -61,9 +61,11 @@ public class ReservationController {
     @PostMapping("/{reservationId}/cancel")
     public ReservationResponse cancel(
         @RequestHeader("X-Tenant-Id") String tenantId,
-        @PathVariable Long reservationId
+        @PathVariable Long reservationId,
+        @RequestHeader(value = "X-User-Id", required = false) String actorUserId,
+        @Valid @RequestBody CancelReservationRequest request
     ) {
-        Reservation reservation = reservationService.cancel(tenantId, reservationId);
+        Reservation reservation = reservationService.cancel(tenantId, reservationId, request.reason(), actorUserId);
         return ReservationResponse.from(reservation);
     }
 

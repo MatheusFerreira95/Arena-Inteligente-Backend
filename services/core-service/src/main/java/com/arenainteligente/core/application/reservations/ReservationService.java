@@ -7,10 +7,12 @@ import com.arenainteligente.core.domain.courts.Court;
 import com.arenainteligente.core.domain.courts.CourtStatus;
 import com.arenainteligente.core.infrastructure.repository.CourtAvailabilityRepository;
 import com.arenainteligente.core.domain.reservations.Reservation;
+import com.arenainteligente.core.domain.reservations.ReservationAuditEvent;
 import com.arenainteligente.core.domain.reservations.ReservationStatus;
 import com.arenainteligente.core.infrastructure.repository.CourtRepository;
 import com.arenainteligente.core.infrastructure.repository.CourtUnavailabilityBlockRepository;
 import com.arenainteligente.core.infrastructure.repository.ReservationRepository;
+import com.arenainteligente.core.infrastructure.repository.ReservationAuditEventRepository;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,17 +29,20 @@ public class ReservationService {
     private final CourtAvailabilityRepository courtAvailabilityRepository;
     private final CourtUnavailabilityBlockRepository courtUnavailabilityBlockRepository;
     private final ReservationRepository reservationRepository;
+    private final ReservationAuditEventRepository reservationAuditEventRepository;
 
     public ReservationService(
         CourtRepository courtRepository,
         CourtAvailabilityRepository courtAvailabilityRepository,
         CourtUnavailabilityBlockRepository courtUnavailabilityBlockRepository,
-        ReservationRepository reservationRepository
+        ReservationRepository reservationRepository,
+        ReservationAuditEventRepository reservationAuditEventRepository
     ) {
         this.courtRepository = courtRepository;
         this.courtAvailabilityRepository = courtAvailabilityRepository;
         this.courtUnavailabilityBlockRepository = courtUnavailabilityBlockRepository;
         this.reservationRepository = reservationRepository;
+        this.reservationAuditEventRepository = reservationAuditEventRepository;
     }
 
     @Transactional
@@ -87,14 +92,27 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation cancel(String tenantId, Long reservationId) {
+    public Reservation cancel(String tenantId, Long reservationId, String reason, String actorUserId) {
+        if (reason == null || reason.isBlank()) {
+            throw new ConflictException("Cancel reason is required");
+        }
         Reservation reservation = reservationRepository.findByIdAndTenantId(reservationId, tenantId)
             .orElseThrow(() -> new NotFoundException("Reservation not found"));
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             return reservation;
         }
-        reservation.cancel();
-        return reservationRepository.save(reservation);
+        reservation.cancel(reason);
+        Reservation saved = reservationRepository.save(reservation);
+        reservationAuditEventRepository.save(
+            new ReservationAuditEvent(
+                tenantId,
+                saved.getId(),
+                "RESERVATION_CANCELLED",
+                "Reservation cancelled: " + reason,
+                actorUserId
+            )
+        );
+        return saved;
     }
 
     public Map<LocalDate, List<Reservation>> agendaByDay(String tenantId, Long courtId, LocalDateTime from, LocalDateTime to) {
