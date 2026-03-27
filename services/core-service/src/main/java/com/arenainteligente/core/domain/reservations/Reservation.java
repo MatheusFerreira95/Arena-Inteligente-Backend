@@ -38,6 +38,9 @@ public class Reservation {
     @Column(nullable = false, length = 30)
     private ReservationStatus status;
 
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -65,4 +68,11 @@ public class Reservation {
     public LocalDateTime getStartAt() { return startAt; }
     public LocalDateTime getEndAt() { return endAt; }
     public ReservationStatus getStatus() { return status; }
+    public LocalDateTime getCancelledAt() { return cancelledAt; }
+
+    public void cancel() {
+        this.status = ReservationStatus.CANCELLED;
+        this.cancelledAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
+    }
 }

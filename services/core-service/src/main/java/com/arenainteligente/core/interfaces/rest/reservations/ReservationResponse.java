@@ -11,7 +11,8 @@ public record ReservationResponse(
     String customerUserId,
     LocalDateTime startAt,
     LocalDateTime endAt,
-    ReservationStatus status
+    ReservationStatus status,
+    LocalDateTime cancelledAt
 ) {
     public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(
@@ -21,7 +22,8 @@ public record ReservationResponse(
             reservation.getCustomerUserId(),
             reservation.getStartAt(),
             reservation.getEndAt(),
-            reservation.getStatus()
+            reservation.getStatus(),
+            reservation.getCancelledAt()
         );
     }
 }

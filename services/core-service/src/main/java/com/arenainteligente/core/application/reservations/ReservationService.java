@@ -12,8 +12,11 @@ import com.arenainteligente.core.infrastructure.repository.CourtRepository;
 import com.arenainteligente.core.infrastructure.repository.CourtUnavailabilityBlockRepository;
 import com.arenainteligente.core.infrastructure.repository.ReservationRepository;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,23 @@ public class ReservationService {
             to,
             from
         );
+    }
+
+    @Transactional
+    public Reservation cancel(String tenantId, Long reservationId) {
+        Reservation reservation = reservationRepository.findByIdAndTenantId(reservationId, tenantId)
+            .orElseThrow(() -> new NotFoundException("Reservation not found"));
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            return reservation;
+        }
+        reservation.cancel();
+        return reservationRepository.save(reservation);
+    }
+
+    public Map<LocalDate, List<Reservation>> agendaByDay(String tenantId, Long courtId, LocalDateTime from, LocalDateTime to) {
+        List<Reservation> reservations = agenda(tenantId, courtId, from, to);
+        return reservations.stream()
+            .collect(Collectors.groupingBy(res -> res.getStartAt().toLocalDate()));
     }
 
     private void validateAvailabilityWindow(String tenantId, Long courtId, LocalDateTime startAt, LocalDateTime endAt) {

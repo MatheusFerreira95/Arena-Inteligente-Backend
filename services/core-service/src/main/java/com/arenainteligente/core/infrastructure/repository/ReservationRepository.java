@@ -4,6 +4,7 @@ import com.arenainteligente.core.domain.reservations.Reservation;
 import com.arenainteligente.core.domain.reservations.ReservationStatus;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findByTenantIdAndCourtId(String tenantId, Long courtId);
+    Optional<Reservation> findByIdAndTenantId(Long id, String tenantId);
     List<Reservation> findByTenantIdAndCourtIdAndStartAtLessThanAndEndAtGreaterThan(
         String tenantId,
         Long courtId,

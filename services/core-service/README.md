@@ -30,6 +30,12 @@ Segundo slice funcional entregue:
 - validacao de bloqueio de quadra na criacao da reserva
 - consulta de agenda por periodo (`/api/v1/reservations/agenda`)
 
+Terceiro slice funcional entregue:
+
+- cancelamento de reserva com persistencia de `cancelled_at`
+- consulta de agenda consolidada por dia (`/api/v1/reservations/agenda/daily`)
+- sem categorias de bloqueio neste momento (requisito removido)
+
 Observacao de tenancy:
 
 - endpoints funcionais exigem header `X-Tenant-Id`

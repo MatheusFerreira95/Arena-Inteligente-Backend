@@ -1,0 +1,2 @@
+ALTER TABLE reservations
+    ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP NULL;
