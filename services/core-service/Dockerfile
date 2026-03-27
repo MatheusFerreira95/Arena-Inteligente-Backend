@@ -1,6 +1,10 @@
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /build
+COPY . .
+RUN mvn -q -DskipTests package
+
 FROM eclipse-temurin:21-jre
-
 WORKDIR /app
-
-# Placeholder until service bootstrap
-CMD ["sh", "-c", "echo 'core-service bootstrap pendente' && sleep infinity"]
+COPY --from=build /build/target/core-service-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8082
+ENTRYPOINT ["java", "-jar", "app.jar"]

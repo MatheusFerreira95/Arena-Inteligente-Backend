@@ -9,7 +9,7 @@ Este documento consolida o que foi implementado ate aqui e como executar sozinho
 Foi criada uma base com arquitetura hibrida:
 
 - `services/auth-service`: autenticacao/autorizacao
-- `services/core-service`: dominio principal (ainda em placeholder)
+- `services/core-service`: dominio principal (bootstrap tecnico concluido)
 - `services/loyalty-service`: pontos/fidelizacao (ainda em placeholder)
 - `platform/observability`: diretrizes de observabilidade
 
@@ -52,6 +52,7 @@ Arquivos principais:
 ### 1.5 Validacao ja realizada
 
 - `./mvnw test` no `auth-service`: sucesso.
+- `./mvnw test` no `core-service`: sucesso.
 - Stack Docker local: sobe com sucesso.
 
 ## 2. Pre-requisitos
@@ -103,9 +104,29 @@ curl http://localhost:8081/actuator/health
 curl http://localhost:8081/actuator/info
 ```
 
+### Passo 6 - Rodar testes do core-service
+
+```bash
+cd "/home/matheus/projetos/Arena Inteligente/backend/services/core-service"
+./mvnw test
+```
+
+### Passo 7 - Subir core-service
+
+```bash
+./mvnw spring-boot:run
+```
+
+### Passo 8 - Verificar health do core-service
+
+```bash
+curl http://localhost:8082/actuator/health
+curl http://localhost:8082/actuator/info
+```
+
 ## 4. Proximos passos recomendados
 
 1. Implementar OAuth2/OIDC de fato no `auth-service`.
 2. Modelar tenant, user, membership e RBAC (`owner`, `customer`).
-3. Bootstrap do `core-service` no mesmo padrao tecnico.
+3. Definir primeiros modulos funcionais no `core-service` (quadras, agenda, reserva avulsa).
 4. Definir contratos entre `core-service` e `loyalty-service`.
